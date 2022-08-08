@@ -1,4 +1,4 @@
 Cardano Condo,170.0
 Small Cardano Plot - Square,460.0
-Medium Cardano Plot - Square,749.0
+Medium Cardano Plot - Square,750.0
 Large Cardano Plot - Square,1799.0

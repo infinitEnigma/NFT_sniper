@@ -5,7 +5,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Virtua NFT ︻デ═一 BOT. I am alive!!!"
+    return "Virtua NFTs ︻デ═一 BOT. I am alive!!!"
 
 def run():
   app.run(host='0.0.0.0',port=8080)

@@ -28,7 +28,7 @@ class PriceGetter:
             print("PriceGetter: something went wrong", e)
             return ''
         try:
-            sleep(0.4)
+            sleep(0.5)
             return self.driver.find_element(By.CSS_SELECTOR, 'body').text
         except Exception as e:
             print("PriceGetter: no ada_value", e)
@@ -126,9 +126,9 @@ async def on_ready():
     # open chrome driver
     try:
         driver = openChrome()
-        sleep(2)
+        sleep(3)
     except Exception as e:
-        print("main: driver error:", e)
+        print("main1: driver error:", e)
         sleep(1)
         return
     coll_urls, coll_floors, check_floors = [], [], {}
@@ -137,7 +137,8 @@ async def on_ready():
             cf = [l.split(',') for l in f]
         coll_floors.append(dict({it[0]: float(it[1]) for it in cf}))
         coll_urls.append(CollectionNFT(coll_floors[-1], coll[1][1], coll[1][2]).createURLs())
-        check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], coll_urls[-1][0], coll_urls[-1][1], coll_floors[-1])
+        check_floors[coll[0]] = CheckFloors(driver).checkPrices(
+            coll[0], coll_urls[-1][0], coll_urls[-1][1], coll_floors[-1])
         if len(check_floors[coll[0]])<=1:
             driver.quit()
             print("main: no check_floors")
@@ -145,46 +146,53 @@ async def on_ready():
             return
         # if there's a change in price send discord messages
         if -check_floors[coll[0]][1][0]+check_floors[coll[0]][1][1] > 0:
-            for e in check_floors[coll[0]][2]:
-                await chnl.send(embed=e)
-                await asyncio.sleep(0.1)
-            print('...discord embeds sent..')
-            quote = get_quote()
-            if quote: await chnl.send(f'||{quote}||')
-            print('discord quote sent..\n\n')
+            await sendDiscordMsgs(check_floors[coll[0]][2], chnl)
     driver.quit()
-    sleep(5)
+    sleep(10)
     change_tracker = dict({coll:[0,0,0] for coll in data.keys()})
     GCounter = 0
     c = 0
     while True:
         GCounter += 1
-        driver = openChrome()
-        sleep(2)
+        try:
+            driver = openChrome()
+            sleep(3)
+        except Exception as e:
+            print("main2: driver error:", e)
+            sleep(1)
+            return
         for coll in data.items():
-            check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], coll_urls[c][0], coll_urls[c][1], check_floors[coll[0]][0])
+            check_floors[coll[0]] = CheckFloors(driver).checkPrices(
+                coll[0], coll_urls[c][0], coll_urls[c][1], check_floors[coll[0]][0])
             if len(check_floors[coll[0]])<=1:
                 driver.quit()
-                print("main: no check_floors in while loop")
+                print("main2: no check_floors in while loop")
                 sleep(3)
                 return
-            # if there's a change in price send discord messages
+            # if there's a change in price update changes tracker and send discord messages
             if -check_floors[coll[0]][1][0]+check_floors[coll[0]][1][1] > 0:
-                change_tracker[coll[0]] = [change_tracker[coll[0]][0]+check_floors[coll[0]][1][0], change_tracker[coll[0]][1]+check_floors[coll[0]][1][1], change_tracker[coll[0]][2]+1]
-                for e in check_floors[coll[0]][2]:
-                    await chnl.send(embed=e)
-                    await asyncio.sleep(0.1)
-                print('...discord embeds sent..')
-                quote = get_quote()
-                if quote: await chnl.send(f'||{quote}||')
-                print('...discord quote sent..\n\n')
+                p = change_tracker[coll[0]][0]+check_floors[coll[0]][1][0]
+                n = change_tracker[coll[0]][1]+check_floors[coll[0]][1][1]
+                change_tracker[coll[0]] = [p, n, change_tracker[coll[0]][2]+1]
+                await sendDiscordMsgs(check_floors[coll[0]][2], chnl)
+            # print changes    
             print(f'changes since\nthe session start: lowered {change_tracker[coll[0]][0]}, raised +{change_tracker[coll[0]][1]}')
             print(f'\nchanges/checks: {change_tracker[coll[0]][2]}/{GCounter}\n')
             c += 1
         c = 0
         print(datetime.now(), 'pause...\n\n')
         driver.quit()
-        sleep(5)
+        sleep(10)
+
+async def sendDiscordMsgs(embeds, chnl):
+    for e in embeds:
+        await chnl.send(embed=e)
+        await asyncio.sleep(0.1)
+    print('..discord embeds sent...')
+    quote = get_quote()
+    if quote: 
+        await chnl.send(f'||{quote}||')
+        print('..discord quote sent...\n')
 
 def get_quote():
     try:
