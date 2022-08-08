@@ -85,7 +85,7 @@ class CheckFloors:
               t = f'{chgs.index(it)+1}. {it[0]}: ... new floor {it[1]}'
               l = f'\n[NFT link - jpg.store]({nfts_urls[it[0]]})'
               d = 'change: ' + str(it[2] if it[2]<0 else f"+{it[2]}") + '\n' + l
-              embed1 = discord.Embed(title=t, description=d, color=1157128 if it[2]<0 else 1107128)
+              embed1 = discord.Embed(title=t, description=d, color=1157128 if it[2]<0 else 16711680)
               for img in imgs:
                 if it[0] == img[0]: 
                     embed1.set_thumbnail(url=img[1])
