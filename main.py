@@ -24,7 +24,7 @@ class PriceGetter:
             print("PriceGetter: something went wrong", e)
             return ''
         try:
-            sleep(1.5)
+            sleep(0.5)
             return self.driver.find_element(By.CSS_SELECTOR, 'body').text
         except Exception as e:
             print("PriceGetter: no ada_value", e)
@@ -82,9 +82,9 @@ class CheckFloors:
             embed1.set_thumbnail(url=ic_url[0])
             embed.append(embed1)
             for it in chgs: 
-              t = f'{chgs.index(it)+1}. {it[0]}: ... new floor {it[1]}'
+              t = f'{chgs.index(it)+1}. {it[0]}:\n... new floor ₳ {it[1]}'
               l = f'\n[NFT link - jpg.store]({nfts_urls[it[0]]})'
-              d = 'change: ' + str(it[2] if it[2]<0 else f"+{it[2]}") + '\n' + l
+              d = 'change: ' + str('₳ '+ str(it[2]) if it[2]<0 else f"₳ +{it[2]}") + '\n' + l
               embed1 = discord.Embed(title=t, description=d, color=1157128 if it[2]<0 else 16711680)
               for img in imgs:
                 if it[0] == img[0]: 
@@ -93,8 +93,8 @@ class CheckFloors:
               embed.append(embed1)
             embed2 = discord.Embed(title=coll_name, description="*collection current floors:*")
             for item in nfts_floors.items(): 
-              embed2.add_field(name=item[0], value=item[1], inline=True) 
-            embed2.set_footer(text=f'Collection Total: {sum(nfts_floors.values())}')
+              embed2.add_field(name=item[0], value='₳ ' + item[1], inline=True) 
+            embed2.set_footer(text=f'Collection Total: ₳ {sum(nfts_floors.values())}')
             embed2.set_thumbnail(url=ic_url[0])
             embed.append(embed2)
         # get change sums    
