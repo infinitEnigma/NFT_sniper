@@ -1,5 +1,5 @@
-Tree of life,335.0
-Gentle turtle,200.0
+Tree of life,325.0
+Gentle turtle,210.0
 Magical bison,140.0
 Friendly sprites,120.0
 Flying stingrays,130.0
