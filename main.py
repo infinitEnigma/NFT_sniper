@@ -82,9 +82,9 @@ class CheckFloors:
             embed1.set_thumbnail(url=ic_url[0])
             embed.append(embed1)
             for it in chgs: 
-              t = f'{chgs.index(it)+1}. {it[0]}:\n    ... new floor: ₳ {it[1]}'
-              l = f'\n    [NFT link - jpg.store]({nfts_urls[it[0]]})'
-              d = '    change: ' + str('₳ '+ str(it[2]) if it[2]<0 else f"₳ +{it[2]}") + '\n' + l
+              t = f'{chgs.index(it)+1}. {it[0]}:\n... new floor: ₳ {it[1]}'
+              l = f'\n[NFT link - jpg.store]({nfts_urls[it[0]]})'
+              d = 'change: ' + str('₳ '+ str(it[2]) if it[2]<0 else f"₳ +{it[2]}") + '\n' + l
               embed1 = discord.Embed(title=t, description=d, color=1157128 if it[2]<0 else 16711680)
               for img in imgs:
                 if it[0] == img[0]: 
@@ -207,12 +207,10 @@ def openChrome():
   chrome_options.add_argument('--headless')
   return webdriver.Chrome(options=chrome_options)
 
-
-def main():  
-  client.run(os.getenv('TOKEN'))
+#def main():  
+keep_alive()  
+client.run(os.getenv('TOKEN'))
+   
+#if __name__ == "__main__":
   
-    
-if __name__ == "__main__":
-  main()
-  keep_alive()  
-  
+  #main()

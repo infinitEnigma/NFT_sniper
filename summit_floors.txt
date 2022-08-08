@@ -2,6 +2,6 @@ Tree of life,325.0
 Gentle turtle,210.0
 Magical bison,140.0
 Friendly sprites,120.0
-Flying stingrays,130.0
-Beautiful butterflies,125.0
-Cardano logo,90.0
+Flying stingrays,125.0
+Beautiful butterflies,120.0
+Cardano logo,92.0
