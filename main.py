@@ -139,12 +139,6 @@ async def on_ready():
         sleep(1)
         return
     coll_urls, coll_floors, check_floors = [], [], {}
-    # create dictionary of the collections urls 
-    for coll in data.items():
-        with open(coll[1][0], 'r') as f:
-            cf = [l.split(',') for l in f]
-        coll_floors.append(dict({it[0]: float(it[1]) for it in cf}))
-        coll_urls.append(CollectionNFT(coll_floors[-1], coll[1][1], coll[1][2]).createURLs())
     change_tracker = dict({coll:[0,0,0] for coll in data.keys()})
     GCounter = 0
     c = 0
@@ -152,7 +146,13 @@ async def on_ready():
     while True:
         GCounter += 1
         for coll in data.items():
-            check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], coll_urls[c][0], coll_urls[c][1], check_floors[coll[0]][0] if c>0 else coll_floors[c])
+            # create dictionary of the collections urls
+            with open(coll[1][0], 'r') as f:
+                cf = [l.split(',') for l in f]
+            coll_floors.append(dict({it[0]: float(it[1]) for it in cf}))
+            coll_urls.append(CollectionNFT(coll_floors[-1], coll[1][1], coll[1][2]).createURLs())
+            # check floors
+            check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], coll_urls[c][0], coll_urls[c][1], coll_floors[-1])
             sleep(0.5)
             if len(check_floors[coll[0]])<=1:
                 driver.quit()
