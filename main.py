@@ -46,7 +46,9 @@ class PriceGetter:
             return ''
         try:
             sleep(0.5)
-            return self.driver.find_element(By.CSS_SELECTOR, 'body').text
+            bt = self.driver.find_element(By.CSS_SELECTOR, 'body').text
+            self.driver.get('chrome://settings/clearBrowserData')
+            return bt
         except Exception as e:
             print("PriceGetter: no text in the body", e)
             return ''
@@ -62,7 +64,6 @@ class CheckFloors:
         chgs = []
         for a in nfts_urls.values():
             adavalue = PriceGetter(self.driver).getJpgStore(a)
-            self.driver.get('chrome://settings/clearBrowserData')
             if adavalue and adavalue != '':
                 adavalue = adavalue.split('\n')
                 for v in range(len(adavalue)-1):
