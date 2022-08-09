@@ -1,16 +1,13 @@
 import os
 import json
 import asyncio
-import requests
 import discord
-
-from keep_alive import keep_alive
-from datetime import datetime
-from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-
+from keep_alive import keep_alive
+from datetime import datetime
+from time import sleep
 from nft_data import data, channel
 
 #from replit import db
@@ -18,10 +15,30 @@ from nft_data import data, channel
 
 client = discord.Client()
 
+def openChrome():
+    chrome_options = Options()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument("--incognito")
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument("--verbose")
+    return webdriver.Chrome(options=chrome_options)
+
+class CollectionNFT:
+    def __init__(self, coll_floors, collurl, sufix):
+        self.cf = coll_floors
+        self.url = collurl
+        self.sufx = sufix
+    # prepare urls
+    def createURLs(self):
+        nft_urls = dict({name: url  for name,url in zip(self.cf.keys(),[f'{self.url}{s}' for s in self.sufx])})
+        nft_names = list(nft_urls.keys())
+        return [nft_names, nft_urls]
+
 class PriceGetter:
     def __init__(self, driver):
         self.driver = driver
-
+    # get text from the page body 
     def getJpgStore(self, ch):
         try: self.driver.get(ch)
         except Exception as e:
@@ -31,7 +48,7 @@ class PriceGetter:
             sleep(0.5)
             return self.driver.find_element(By.CSS_SELECTOR, 'body').text
         except Exception as e:
-            print("PriceGetter: no ada_value", e)
+            print("PriceGetter: no text in the body", e)
             return ''
 
 class CheckFloors:
@@ -39,13 +56,13 @@ class CheckFloors:
         self.driver = driver
         self.raised = []
         self.lowered = []
-
-
+    # extract prices and check for the changes
     def checkPrices(self, coll_name, nfts_names, nfts_urls, nfts_floors):
         print(f'Collection: {coll_name}\n')
         chgs = []
         for a in nfts_urls.values():
             adavalue = PriceGetter(self.driver).getJpgStore(a)
+            self.driver.get('chrome://settings/clearBrowserData')
             if adavalue and adavalue != '':
                 adavalue = adavalue.split('\n')
                 for v in range(len(adavalue)-1):
@@ -69,6 +86,7 @@ class CheckFloors:
                 return [0]
         print("\nTOTAL:", sum(nfts_floors.values()),"\n")
         embed = []
+        # if change is detected prepare reports
         if len(self.raised)+len(self.lowered)>0:
             fname = data[coll_name][0]
             imgs = data[coll_name][4]
@@ -104,17 +122,6 @@ class CheckFloors:
         sum_raised = sum(float(s.split(',')[2]) for s in self.raised)
         return [nfts_floors, [sum_lowered, sum_raised], embed]
 
-class CollectionNFT:
-    def __init__(self, coll_floors, collurl, sufix):
-        self.cf = coll_floors
-        self.url = collurl
-        self.sufx = sufix
-    # prepare urls
-    def createURLs(self):
-        nft_urls = dict({name: url  for name,url in zip(self.cf.keys(),[f'{self.url}{s}' for s in self.sufx])})
-        nft_names = list(nft_urls.keys())
-        return [nft_names, nft_urls]
-
 
 @client.event
 async def on_ready():
@@ -132,84 +139,59 @@ async def on_ready():
         sleep(1)
         return
     coll_urls, coll_floors, check_floors = [], [], {}
+    # create dictionary of the collections urls 
     for coll in data.items():
         with open(coll[1][0], 'r') as f:
             cf = [l.split(',') for l in f]
         coll_floors.append(dict({it[0]: float(it[1]) for it in cf}))
-        coll_urls.append(CollectionNFT(coll_floors[-1], coll[1][1], coll[1][2]).createURLs())
-        check_floors[coll[0]] = CheckFloors(driver).checkPrices(
-            coll[0], coll_urls[-1][0], coll_urls[-1][1], coll_floors[-1])
-        if len(check_floors[coll[0]])<=1:
-            driver.quit()
-            print("main: no check_floors")
-            sleep(3)
-            return
-        # if there's a change in price send discord messages
-        if -check_floors[coll[0]][1][0]+check_floors[coll[0]][1][1] > 0:
-            await sendDiscordMsgs(check_floors[coll[0]][2], chnl)
-    driver.quit()
-    sleep(10)
     change_tracker = dict({coll:[0,0,0] for coll in data.keys()})
     GCounter = 0
     c = 0
+    # loop through the collections and check floors
     while True:
         GCounter += 1
-        try:
-            driver = openChrome()
-            sleep(3)
-        except Exception as e:
-            print("main2: driver error:", e)
-            sleep(1)
-            return
         for coll in data.items():
             check_floors[coll[0]] = CheckFloors(driver).checkPrices(
-                coll[0], coll_urls[c][0], coll_urls[c][1], check_floors[coll[0]][0])
+                coll[0], coll_urls[c][0], coll_urls[c][1], 
+                check_floors[coll[0]][0] if c>0 else coll_floors[-1])
+            sleep(0.5)
             if len(check_floors[coll[0]])<=1:
                 driver.quit()
                 print("main2: no check_floors in while loop")
                 sleep(3)
                 return
-            # if there's a change in price update changes tracker and send discord messages
+            # if there's a change in price 
+            # update changes tracker and send discord messages
             if -check_floors[coll[0]][1][0]+check_floors[coll[0]][1][1] > 0:
                 p = change_tracker[coll[0]][0]+check_floors[coll[0]][1][0]
                 n = change_tracker[coll[0]][1]+check_floors[coll[0]][1][1]
                 change_tracker[coll[0]] = [p, n, change_tracker[coll[0]][2]+1]
-                await sendDiscordMsgs(check_floors[coll[0]][2], chnl)
+                await sendDiscordMsgs(check_floors[coll[0]][2], chnl, driver)
             # print changes    
             print(f'changes since\nthe session start: lowered {change_tracker[coll[0]][0]}, raised +{change_tracker[coll[0]][1]}')
             print(f'\nchanges/checks: {change_tracker[coll[0]][2]}/{GCounter}\n')
             c += 1
         c = 0
         print(datetime.now(), 'pause...\n\n')
-        driver.quit()
         sleep(10)
 
-async def sendDiscordMsgs(embeds, chnl):
+
+def get_quote(driver):
+    response = PriceGetter(driver).getJpgStore("https://zenquotes.io/api/random")
+    json_data = json.loads(response.text)
+    return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
+
+
+async def sendDiscordMsgs(embeds, chnl, driver):
     for e in embeds:
         await chnl.send(embed=e)
         await asyncio.sleep(0.1)
     print('..discord embeds sent...')
-    quote = get_quote()
+    quote = get_quote(driver)
     if quote: 
         await chnl.send(f'||{quote}||')
         print('..discord quote sent...\n')
-
-def get_quote():
-    try:
-        response = requests.get("https://zenquotes.io/api/random")
-        json_data = json.loads(response.text)
-    except:
-        print('no quote!')
-        return
-    return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
-
-def openChrome():
-    chrome_options = Options()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--headless')
-    return webdriver.Chrome(options=chrome_options)
-
+ 
 
 keep_alive()
 client.run(os.getenv('TOKEN'))
