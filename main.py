@@ -8,9 +8,7 @@ from selenium.webdriver.chrome.options import Options
 from keep_alive import keep_alive
 from datetime import datetime
 from time import sleep
-from nft_data import data, channel
-
-#from replit import db
+from replit import db
 #from discord.ext import commands
 
 client = discord.Client()
@@ -24,22 +22,12 @@ def openChrome():
     chrome_options.add_argument("--verbose")
     return webdriver.Chrome(options=chrome_options)
 
-class CollectionNFT:
-    def __init__(self, coll_floors, collurl, sufix):
-        self.cf = coll_floors
-        self.url = collurl
-        self.sufx = sufix
-    # prepare urls
-    def createURLs(self):
-        nft_urls = dict({name: url  for name,url in zip(self.cf.keys(),[f'{self.url}{s}' for s in self.sufx])})
-        nft_names = list(nft_urls.keys())
-        return [nft_names, nft_urls]
 
-class PriceGetter:
+class PageGetter:
     def __init__(self, driver):
         self.driver = driver
     # get text from the page body 
-    def getJpgStore(self, ch):
+    def getPage(self, ch):
         try: self.driver.get(ch)
         except Exception as e:
             print("PriceGetter: something went wrong", e)
@@ -63,7 +51,7 @@ class CheckFloors:
         print(f'Collection: {coll_name}\n')
         chgs = []
         for a in nfts_urls.values():
-            adavalue = PriceGetter(self.driver).getJpgStore(a)
+            adavalue = PageGetter(self.driver).getPage(a)
             if adavalue and adavalue != '':
                 adavalue = adavalue.split('\n')
                 for v in range(len(adavalue)-1):
@@ -89,14 +77,12 @@ class CheckFloors:
         embed = []
         # if change is detected prepare reports
         if len(self.raised)+len(self.lowered)>0:
-            fname = data[coll_name][0]
-            imgs = data[coll_name][4]
-            # write last known values to file
-            with open(fname, 'w') as f:
-                f.write(''.join(f'{item[0]},{item[1]}\n' for item in nfts_floors.items()))
+            imgs = db['data'][coll_name][4]
+            # write last known values to file/db
+            db[db['data'][coll_name][0]] = dict({it[0]: float(it[1]) for it in nfts_floors.items()})
             # prepare discord message - embed
-            ic_url = [ic[1][3] for ic in data.items() if ic[0]==coll_name]
-            l = f'[Collection link - jpg.store]({data[coll_name][1][:-12]})'
+            ic_url = [ic[1][3] for ic in db['data'].items() if ic[0]==coll_name]
+            l = f'[Collection link - jpg.store]({db["data"][coll_name][1][:-12]})'
             d = l + "\n*collection latest changes:*\n" if len(chgs)>1 else l + '\n*collection latest change:*\n'
             embed = []
             embed1 = discord.Embed(title=coll_name, description=d, color=1127128)
@@ -130,7 +116,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    chnl = client.get_channel(channel[0])
+    chnl = client.get_channel(db['channel'][0])
     # open chrome driver
     try:
         driver = openChrome()
@@ -139,21 +125,17 @@ async def on_ready():
         print("main1: driver error:", e)
         sleep(1)
         return
-    coll_urls, coll_floors, check_floors = [], [], {}
-    change_tracker = dict({coll:[0,0,0] for coll in data.keys()})
+    check_floors = {}  
+    change_tracker = dict({coll:[0,0,0] for coll in db['data'].keys()})
     GCounter = 0
     c = 0
     # loop through the collections and check floors
     while True:
         GCounter += 1
-        for coll in data.items():
-            # create dictionary of the collections urls
-            with open(coll[1][0], 'r') as f:
-                cf = [l.split(',') for l in f]
-            coll_floors.append(dict({it[0]: float(it[1]) for it in cf}))
-            coll_urls.append(CollectionNFT(coll_floors[-1], coll[1][1], coll[1][2]).createURLs())
+        print('restarts:', db['restarts'])
+        for coll in db['data'].items():
             # check floors
-            check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], coll_urls[c][0], coll_urls[c][1], coll_floors[-1])
+            check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], db['coll_urls'][c][0], db['coll_urls'][c][1], db['coll_floors'][c])
             sleep(0.5)
             if len(check_floors[coll[0]])<=1:
                 driver.quit()
@@ -177,7 +159,7 @@ async def on_ready():
 
 
 def get_quote(driver):
-    response = PriceGetter(driver).getJpgStore("https://zenquotes.io/api/random")
+    response = PageGetter(driver).getPage("https://zenquotes.io/api/random")
     json_data = json.loads(response)
     return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
 

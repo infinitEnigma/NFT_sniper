@@ -1,7 +1,0 @@
-Pluto Fortune - Cardano Livery,80.0
-Nyx Lightning - Cardano Livery,42.99
-Blue Ridley,65.0
-Sea Breeze,70.0
-Stingray,80.9
-Apex Helicopter,185.0
-Escort Fighter Jet,1700.0
