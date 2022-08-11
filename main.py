@@ -33,14 +33,16 @@ class PageGetter:
             print("PriceGetter: something went wrong", e)
             return ''
         try:
-            sleep(0.5)
+            sleep(0.3)
             bt = self.driver.find_element(By.CSS_SELECTOR, 'body').text
-            self.driver.get('chrome://settings/clearBrowserData')
-            return bt
         except Exception as e:
             print("PriceGetter: no text in the body", e)
             return ''
-
+        try: 
+            self.driver.get('chrome://settings/clearBrowserData')
+        except: print("couldn't clear browser cash")
+        return bt
+        
 class CheckFloors:
     def __init__(self, driver):
         self.driver = driver
@@ -50,6 +52,7 @@ class CheckFloors:
     def checkPrices(self, coll_name, nfts_names, nfts_urls, nfts_floors):
         print(f'Collection: {coll_name}\n')
         chgs = []
+        quote = ''
         for a in nfts_urls.values():
             adavalue = PageGetter(self.driver).getPage(a)
             if adavalue and adavalue != '':
@@ -69,6 +72,7 @@ class CheckFloors:
                                 print(f"{adavalue[v]}: {(30-len(adavalue[v]))*' '}{adavalue[v+1]} - floor lowered!!! {change}")
                             nfts_floors[adavalue[v]] = float(adavalue[v+1])
                             chgs.append((adavalue[v], adavalue[v+1], round(change,2)))
+                            quote = get_quote(self.driver)
                         break
             else:
                 print('CheckFloors: no adavalue')
@@ -84,10 +88,11 @@ class CheckFloors:
             ic_url = [ic[1][3] for ic in db['data'].items() if ic[0]==coll_name]
             l = f'[Collection link - jpg.store]({db["data"][coll_name][1][:-12]})'
             d = l + "\n*collection latest changes:*\n" if len(chgs)>1 else l + '\n*collection latest change:*\n'
-            embed = []
+            embed, twitt = [], []
             embed1 = discord.Embed(title=coll_name, description=d, color=1127128)
             embed1.set_thumbnail(url=ic_url[0])
             embed.append(embed1)
+            twitt.append([ic_url[0], coll_name])
             for it in chgs:
                 t = f'{chgs.index(it)+1}. {it[0]}:\n... new floor: ₳ {it[1]}'
                 l = f'\n[NFT link - jpg.store]({nfts_urls[it[0]]})'
@@ -96,6 +101,7 @@ class CheckFloors:
                 for img in imgs:
                     if it[0] == img[0]:
                         embed1.set_thumbnail(url=img[1])
+                        twitt.append([img[1], t])
                         break
                 embed.append(embed1)
             embed2 = discord.Embed(title=coll_name, description="*collection current floors:*")
@@ -104,10 +110,12 @@ class CheckFloors:
             embed2.set_footer(text=f'Collection Total: ₳ {sum(nfts_floors.values())}')
             embed2.set_thumbnail(url=ic_url[0])
             embed.append(embed2)
+            db['twitter'] = twitt
+            #twitt.append(ic_url[0], '*collection current floors:*')
         # get change sums
         sum_lowered = sum(float(s.split(',')[2]) for s in self.lowered)
         sum_raised = sum(float(s.split(',')[2]) for s in self.raised)
-        return [nfts_floors, [sum_lowered, sum_raised], embed]
+        return [nfts_floors, [sum_lowered, sum_raised], [embed, quote]]
 
 
 @client.event
@@ -117,10 +125,11 @@ async def on_ready():
     print(client.user.id)
     print('------')
     chnl = client.get_channel(db['channel'][0])
+    db['restarts'] = [db['restarts'][0]+1, str(datetime.now())]
     # open chrome driver
     try:
         driver = openChrome()
-        sleep(3)
+        sleep(5)
     except Exception as e:
         print("main1: driver error:", e)
         sleep(1)
@@ -136,7 +145,7 @@ async def on_ready():
         for coll in db['data'].items():
             # check floors
             check_floors[coll[0]] = CheckFloors(driver).checkPrices(coll[0], db['coll_urls'][c][0], db['coll_urls'][c][1], db['coll_floors'][c])
-            sleep(0.5)
+            #sleep(0.5)
             if len(check_floors[coll[0]])<=1:
                 driver.quit()
                 print("main2: no check_floors in while loop")
@@ -148,14 +157,15 @@ async def on_ready():
                 p = change_tracker[coll[0]][0]+check_floors[coll[0]][1][0]
                 n = change_tracker[coll[0]][1]+check_floors[coll[0]][1][1]
                 change_tracker[coll[0]] = [p, n, change_tracker[coll[0]][2]+1]
-                await sendDiscordMsgs(check_floors[coll[0]][2], chnl, driver)
+                e, q = check_floors[coll[0]][2][0], check_floors[coll[0]][2][1] 
+                await sendDiscordMsgs(e, q, chnl, driver)
             # print changes    
             print(f'changes since\nthe session start: lowered {change_tracker[coll[0]][0]}, raised +{change_tracker[coll[0]][1]}')
             print(f'\nchanges/checks: {change_tracker[coll[0]][2]}/{GCounter}\n')
             c += 1
         c = 0
         print(datetime.now(), 'pause...\n\n')
-        sleep(10)
+        sleep(5)
 
 
 def get_quote(driver):
@@ -164,13 +174,13 @@ def get_quote(driver):
     return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
 
 
-async def sendDiscordMsgs(embeds, chnl, driver):
+async def sendDiscordMsgs(embeds, quote, chnl, driver):
     for e in embeds:
+        await asyncio.sleep(0.2)
         await chnl.send(embed=e)
-        await asyncio.sleep(0.1)
-    print('..discord embeds sent...')
-    quote = get_quote(driver)
-    if quote: 
+        print(f'..discord embed {e.title} sent...')
+    if quote !='': 
+        await asyncio.sleep(0.2)
         await chnl.send(f'||{quote}||')
         print('..discord quote sent...\n')
  
