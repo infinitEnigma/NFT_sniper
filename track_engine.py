@@ -1,5 +1,5 @@
 
-import os
+#import os
 import json
 #import asyncio
 #import discord
@@ -153,6 +153,9 @@ def loopCollections(driver):
         check = 'False'
         print('restarts:', db['restarts'])
         for coll in db['data'].items():
+            if 'saved_state' in db.keys():
+                if coll != db['saved_state']:
+                    continue
             # check floors
             check = CheckFloors(driver).checkPrices(coll[0], c)
             sleep(0.5)
@@ -167,6 +170,7 @@ def loopCollections(driver):
                 n = db['change_tracker'][coll[0]][1]+db['sum_raised']
                 db['change_tracker'][coll[0]] = [p, n, db['change_tracker'][coll[0]][2]+1]
                 print('pause while messages are sent...')
+                db['saved_state'] = coll
                 return 'send'
             print(f"changes since\nthe session start: lowered {db['change_tracker'][coll[0]][0]}, raised +{db['change_tracker'][coll[0]][1]}")
             print(f"\nchanges/checks: {db['change_tracker'][coll[0]][2]}/{db['gCounter']}\n")

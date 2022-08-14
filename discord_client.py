@@ -1,7 +1,7 @@
 import os
 import asyncio
 import discord
-from keep_alive import keep_alive
+#from keep_alive import keep_alive
 from replit import db
 from time import sleep
 from datetime import datetime
@@ -46,23 +46,18 @@ async def on_ready():
                 print('..discord quote sent...\n')
             db['discord_embed'] = []
             print(f'finished....{datetime.now()}....\n')
-            await client.close()
-            return
+            break
+            
+    try: 
+        await client.close()
+        print('loop closed')   
+    except: print('loop killed')
 
 
+async def init():
+    print('init')
 
-#def init():
-print('init')
-client.run(os.getenv('TOKEN'))
-    #keep_alive()
-"""    
-#with open('db.txt','w') as f:
-    #f.write(''.join(f"{it[0]}: {it[1]}\n" for it in db.items()))
+try: asyncio.run(client.start(os.getenv('TOKEN')))
+except: print('client start error')
 
-from threading import Thread
-def init(loop):
-    TOKEN = os.getenv('TOKEN')
-    #loop1 = asyncio.get_event_loop()
-    loop.create_task(client.start(TOKEN))
-    Thread(target=loop.run_forever).start()
-"""
+ 
