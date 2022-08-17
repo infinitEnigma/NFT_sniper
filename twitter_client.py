@@ -3,25 +3,9 @@ import os
 from twitter import *
 from time import sleep
 from datetime import datetime
-from keep_alive import keep_alive
-import asyncio
-### for owner's account automated access
-#ACCESS_KEY = os.environ.get("ACCESS_TOKEN")
-#ACCESS_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
-#t = Twitter(auth=OAuth(ACCESS_KEY, ACCESS_SECRET, CONSUMER_KEY, CONSUMER_SECRET))
+#import asyncio
 
-# Get your "home" timeline
-#print(t.statuses.home_timeline())
-#MY_TWITTER_CREDS = os.path.expanduser('~/.my_app_credentials')
-#if not os.path.exists(MY_TWITTER_CREDS):
-#    oauth_dance("My App Name", CONSUMER_KEY, CONSUMER_SECRET,
-#                MY_TWITTER_CREDS)
 
-#oauth_token, oauth_secret = read_token_file(MY_TWITTER_CREDS)
-#print(oauth_token, oauth_secret)
-
-### using sniper project database to track changes
-#db.db_url = os.environ.get('sniper_db')
 ### for automated account access
 CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
 CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
@@ -76,19 +60,33 @@ def sendTwitt(img, twitt):
     print('status updated')
     
 
-#keep_alive()
-#while True:
-#    if db['twitter'] != []:
-#        checkTwitts(db['twitter'])
-#        db['twitter'] = []
-        #break
-#    sleep(1)
-    
+   
 
-async def test1(c):
-    for i in range(5):
-        print('test started', c, i)
-        c += 1
-        print('test ended', c, i)
-        await asyncio.sleep(2)
+async def twitterSendTwitt(dt):
+   if db['twitter'] != []:
+        try:
+            checkTwitts(db['twitter'])
+            db['twitter'] = []
+            print('twitter init:', dt)
+            print('finished:', datetime.now())
+        except Exception as e: 
+            if not 'twitter_errors' in db.keys():
+                db['twitter_errors'] = [str(datetime.now()), e]
+            else: 
+                db['twitter_errors'].append([str(datetime.now()), e])
+            print('twitter start error:', e)
 
+### for owner's account automated access
+#ACCESS_KEY = os.environ.get("ACCESS_TOKEN")
+#ACCESS_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+#t = Twitter(auth=OAuth(ACCESS_KEY, ACCESS_SECRET, CONSUMER_KEY, CONSUMER_SECRET))
+
+# Get your "home" timeline
+#print(t.statuses.home_timeline())
+#MY_TWITTER_CREDS = os.path.expanduser('~/.my_app_credentials')
+#if not os.path.exists(MY_TWITTER_CREDS):
+#    oauth_dance("My App Name", CONSUMER_KEY, CONSUMER_SECRET,
+#                MY_TWITTER_CREDS)
+
+#oauth_token, oauth_secret = read_token_file(MY_TWITTER_CREDS)
+#print(oauth_token, oauth_secret)

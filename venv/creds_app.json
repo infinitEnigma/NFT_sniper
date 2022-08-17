@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "nft-tracker-359310",
+  "private_key_id": "17603b79deb9868666328108aeb93399b567ecba",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDhN1iYG7y2Ow0v\nEKHij1gnNbY4qVNhkau6meLzosrzOcmkoDT1VIrg4JgU8XSZ450vPjTgo529zDv7\nET4Rd7Wo6H81rfEFXg4y5dXaeK55+HEwCu4go/1r2zod7SCad446Mi6oFdK3WNZo\nRtRNwXDuCLxyo326oh0oOnVgfAMzxuDpJy0wr5U2rsy4XAruP5UtgRRluX2+pIN5\nNbZ2ZdvEJPnGy/cBmpCkyJdHpJhfsJH6y7JhZi1ZkVoXzDfBKPLhDU0XKfUra1o2\nJ3dePUQAwX014JMZnqMWMLadecuaAlMUfFuH+sX6z8ZRwSNL5h3AeXu/r3G7Aoq1\n7Tb1U1dXAgMBAAECggEABrtny4wwtOXI/BosLKCKSwnA+6qcEnOPRZGqBgxcsq6M\nh34+dwLi79vmz+Fz0dHK9gmO/RQG+BBtzpByYYVJidYBT3J2nOl11TGnldM7q+uw\nPnZlLdaZEatI7nITImrmdnjfiii01sQyDIXpfLWGkabzMx4N+RE1e+lbbtnmIpsF\n6QLKwv9V95cRkk+8WN/lVA27WJwPDHW5I8KKx515CqSQoGPw9UW9PlGoO2v9JsfJ\njq+LlUF10YlIGavu/kmOTQrhOi/G4zXEvzPWGs2b9C2n2Zqd17ndWLahThCgvfYr\n+EYBXpuFoZFEcpf0gTL81pj25jiZya3vOC21KFmc+QKBgQD71Nhv90JG+VCD7OjL\n5A4SLZh/JqFdgMW4Gdtyw0dRm8fZWA55H6C8mzOLw5MUscPxU79NMEuxaaZIjfeZ\nOR1K2AYrAyi5UxlerR8u+XiRUcUFB3TLzrhJoQUHOWR5WNupxiYQpvWFSQYnIRai\n1EC3OB1SQBpTIjZaHJTqe4UFNQKBgQDk8bdxU8+2I56wHLE7j/oTzGnFrwh9N6Ck\nwlFwPZsfHdSIMo2/lhdLVvUFoAE8OmmDMB4AduFeJJGZ17X0GOWNTG8/u8vGwiZX\naAZpw4xGxUCuHifl06DRm1T6Ldw9ZkZs38k0ttNNW9BqSIcTMxsjKBNPHBIMInBV\n9Vo3CXO32wKBgBYnCgcHZCAkLE3+mBffbtFwi1qcBlPYUQw50hENVoe6QWFAGr3S\n52vP5z/jK1wFqyveZxSeK/pmRcdaHa6v1IDR8fD0rS9oPPIUHoseTNnTrJYdqsuG\n2rU3Yd7Z0JnQFDqiAJU0aqKX4t+sTHZ0X2D+oa2rj+VCPC+/FeZuiSwFAoGAOw09\ny7Vadhhp7fL4o+xXDJRFFAA5qFKY1OZqKxE42aXQE/E2LpyAFaawPGsw5mAKpxPa\nKTSAnM/B3nSNMhDZ5MA6Ua4WuYWKbjEetlkB7Z8jN8X/dIBJkscF/CGoFQ40TBDM\nzRP7HJD6CO/8Jy+faEoF8PnEjey0HPfT9S4y8tECgYEAkMXsyWMaYIUlRiyDqPTI\nMiRPgsEpLnDbiZDVTARVEMjMlWN/MV7/Wv2UhDWKs0FE1qYoKfA2afGVsM7Szbuj\n/Ljh+7aYFZUgoXGOJ5YkZ2FdWcP3WUTbtd+MEg4sFWTDq748mYBSp6MJcysyuiWw\nZRiOqlFDxq4Am069usbY5HI=\n-----END PRIVATE KEY-----\n",
+  "client_email": "y71bot@nft-tracker-359310.iam.gserviceaccount.com",
+  "client_id": "107935933866508616146",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/y71bot%40nft-tracker-359310.iam.gserviceaccount.com"
+}
