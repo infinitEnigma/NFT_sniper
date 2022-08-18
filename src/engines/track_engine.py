@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from datetime import datetime
 from time import sleep
 from replit import db
-from pack_engine import prepareMessages
+from src.engines.pack_engine import prepareMessages
 
 
 class PageGetter:
@@ -79,7 +79,7 @@ class CheckFloors:
         # get change sums
         if len(self.lowered)>0: db['sum_lowered'] = sum(float(s.split(',')[2]) for s in self.lowered)
         if len(self.raised)>0: db['sum_raised'] = sum(float(s.split(',')[2]) for s in self.raised)
-        return [-db['sum_lowered']+db['sum_raised'], 0]
+        return [-db['sum_lowered']+db['sum_raised'], len(chgs)]
 
 
 def get_coingecko(driver):
@@ -105,8 +105,9 @@ def openChrome():
 
 def loopCollections(driver):
     #driver = openChrome()
-    db['change_tracker'] = dict({coll:[0,0,0] for coll in db['data'].keys()})
-    db['gCounter'] = 0
+    if db['saved_state'][0] == 0:
+        db['change_tracker'] = dict({coll:[0,0,0] for coll in db['data'].keys()})
+        db['gCounter'] = 0
     c = 0
     # loop through the collections and check floors
     while True:
@@ -134,13 +135,12 @@ def loopCollections(driver):
             elif check[0] > 0:
                 p = db['change_tracker'][coll[0]][0]+db['sum_lowered']
                 n = db['change_tracker'][coll[0]][1]+db['sum_raised']
-                db['change_tracker'][coll[0]] = [p, n, db['change_tracker'][coll[0]][2]+1]
+                db['change_tracker'][coll[0]] = [p, n, db['change_tracker'][coll[0]][2]+check[1]]
                 print('pause while messages are sent...')
                 db['saved_state'] = [1, coll[0]] 
                 return 'send'
             print(f"changes since\nthe session start: lowered {db['change_tracker'][coll[0]][0]}, raised +{db['change_tracker'][coll[0]][1]}")
             print(f"\nchanges/checks: {db['change_tracker'][coll[0]][2]}/{db['gCounter']}\n")
-            #c += 1
         c = 0
         print(datetime.now(), 'pause...\n\n')
         sleep(5)

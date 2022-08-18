@@ -69,6 +69,7 @@ async def twitterSendTwitt(dt):
             db['twitter'] = []
             print('twitter init:', dt)
             print('finished:', datetime.now())
+            return 'twitts sent'
         except Exception as e: 
             if not 'twitter_errors' in db.keys():
                 db['twitter_errors'] = [str(datetime.now()), e]

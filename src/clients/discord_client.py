@@ -55,11 +55,12 @@ async def on_ready():
 async def init(dt):
     print('discord init:', dt)
     print('finished:', datetime.now())
+    #return 'discord sent'
     
 try: 
     asyncio.run(client.start(os.getenv('TOKEN')))
 except discord.HTTPException as e: 
-    print('error status:', e.status)
+    print('\nerror status:', e.status)
     db['discord_errors'] = [str(datetime.now()), e.status]
 except Exception as e:
     print('discord_client error:\n', e)
