@@ -64,4 +64,4 @@ except discord.HTTPException as e:
     db['discord_errors'] = [str(datetime.now()), e.status]
 except Exception as e:
     print('discord_client error:\n', e)
-     
+    db['discord_errors'] = [str(datetime.now()), 1] 

@@ -12,20 +12,24 @@ import nest_asyncio
 nest_asyncio.apply()
 
 def killMain():
+    db['discord_errors'][1] = 0
+    db['saved_state'][0] = 0
     try:
         import subprocess
         subprocess.run(['kill', '1'])
-    except Exception as e: print("\nsuicide didn't work\n", e)
+    except Exception as e: 
+        print("\nsuicide didn't work\n", e)
+        db['saved_state'][0] = 1
 
 keep_alive()
 loop = asyncio.get_event_loop() 
 while True:
-    print('check engines')
-    group1 = asyncio.gather(*[track_engine.trackChanges()])# for i in range(1)]) #add init timestamp
+    if db['discord_embed'] == [] and db['twitter'] == []:
+        print('check engines')
+        group1 = asyncio.gather(*[track_engine.trackChanges()])# for i in range(1)]) #add init timestamp
     print('check twitter & google client')
     group2 = asyncio.gather(*[twitter_client.twitterSendTwitt(datetime.now()),
                              google_client.googleUpdateSheet(datetime.now())])
-    
     print('check discord client')
     if 'src.clients.discord_client' not in sys.modules:
         import src.clients.discord_client
@@ -34,15 +38,24 @@ while True:
         importlib.reload(src.clients.discord_client)
         print('discord_client module reloaded')
     group3 = asyncio.gather(*[src.clients.discord_client.init(datetime.now())])
-    all_groups = asyncio.gather(group1, group2, group3)
+    if db['discord_embed'] == [] and db['twitter'] == []:
+        all_groups = asyncio.gather(group1, group2, group3)
+    else: 
+        all_groups = asyncio.gather(group2, group3)
     results = loop.run_until_complete(all_groups)
-    print(f'cycle finished: {datetime.now()}\n')
-    #kill = 0
-    if results: 
-        print(f'\nresults: {results}')
-        if db['discord_errors'][1] == 429 or results[1] == [[],[]] or results[2] == []:
-            print('error!!!...killing main process..')
-            db['discord_errors'][1] = 0
-            killMain()
-    else: killMain()
-
+    print(f'loop completed: {datetime.now()}')
+    
+    if results:
+        print(f'results: {results}')
+        if len(results)==3:
+            if db['discord_errors'][1] != 0 or [None] in results[1] or results[0] == [None]:
+                print('\nresults error!!!...killing main process..\n')
+                killMain()
+        else:
+            if db['discord_errors'][1] != 0 or [None] in results[0]:
+                print('\nresults error!!!...killing main process..\n')
+                killMain()
+    else: 
+        print('\nno results!!!...killing main process..\n')
+        killMain()
+    print('results ok... next loop...\n')
