@@ -63,10 +63,10 @@ def sendTwitt(img, twitt):
    
 
 async def twitterSendTwitt(dt):
-   if db['twitter'] != []:
+   if db['twitter_twitt'] != []:
         try:
-            checkTwitts(db['twitter'])
-            db['twitter'] = []
+            checkTwitts(db['twitter_twitt'])
+            db['twitter_twitt'] = []
             print('twitter init:', dt)
             print('finished:', datetime.now())
             return 'twitts sent'

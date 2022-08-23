@@ -24,6 +24,7 @@ def killMain():
 keep_alive()
 loop = asyncio.get_event_loop() 
 while True:
+    group1 = None
     if db['discord_embed'] == [] and db['twitter'] == []:
         print('check engines')
         group1 = asyncio.gather(*[track_engine.trackChanges()])# for i in range(1)]) #add init timestamp
@@ -38,7 +39,7 @@ while True:
         importlib.reload(src.clients.discord_client)
         print('discord_client module reloaded')
     group3 = asyncio.gather(*[src.clients.discord_client.init(datetime.now())])
-    if db['discord_embed'] == [] and db['twitter'] == []:
+    if group1:
         all_groups = asyncio.gather(group1, group2, group3)
     else: 
         all_groups = asyncio.gather(group2, group3)

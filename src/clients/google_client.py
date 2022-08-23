@@ -3,7 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 from replit import db
 import os
-import json
+#import json
 #import pandas as pd
 
 def openGoogleSheet():
@@ -19,13 +19,8 @@ def openGoogleSheet():
               "token_uri": os.environ.get("token_uri"),
               "auth_provider_x509_cert_url": os.environ.get("auth_provider_x509_cert_url"),
               "client_x509_cert_url": os.environ.get("client_x509_cert_url")}
-    with open('./src/creds.json', 'w') as f:
-        json.dump(creds, f)
-    #cred = ServiceAccountCredentials.from_json_keyfile_name(creds, scope_app)
-    cred = ServiceAccountCredentials.from_json_keyfile_name('./src/creds.json', scope_app) 
+    cred = ServiceAccountCredentials.from_json_keyfile_dict(creds, scope_app)
     client = gspread.authorize(cred)
-    with open('./src/creds.json', 'w') as f:
-        json.dump({'creds': 'creds'}, f)
     return client.open('NFT tracker')
     
 
@@ -57,7 +52,18 @@ def updateCollFloorsSheet():
         c += 1
     sheet_instance.update_cell(r, c, float(coll_floors[1]))
     print('collection spreadsheet updated..')
-       
+    
+    sheet_instance = sheet.get_worksheet(5)
+    r = len(sheet_instance.get_all_values()) + 1
+    pf = [str(now), dt]
+    ch = []
+    for change in db['google_sheet']:
+        ch.append(dict({'range': f'A{r}:J{r}', 'values': [[*pf, *change]]}))
+        r += 1
+        #for i,c in enumerate(change):
+    sheet_instance.batch_update(ch)
+    print('collection spreadsheet batch_updated..')  
+    
    
 async def googleUpdateSheet(ts):
     print('google init:', ts)
