@@ -3,8 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 from replit import db
 import os
-#import json
-#import pandas as pd
+
 
 def openGoogleSheet():
     # define the scope & credentials & authorize the clientsheet 
@@ -22,47 +21,25 @@ def openGoogleSheet():
     cred = ServiceAccountCredentials.from_json_keyfile_dict(creds, scope_app)
     client = gspread.authorize(cred)
     return client.open('NFT tracker')
-    
-
-def prepareCollFloors():
-    if db['discord_embed'] != []:
-            coll_floors = db['discord_embed'][0]
-    coll_name = coll_floors[-1][0]
-    nft_floors = [[l[0], l[1]] for l in coll_floors[-1][2:-1]]
-    coll_total = coll_floors[-1][-1][0].split()[-1]
-    return [coll_name, coll_total, nft_floors]
-    
+   
 
 def updateCollFloorsSheet():
-    coll_floors = prepareCollFloors()
-    sheet = openGoogleSheet()
-        
-    sheet_instance = sheet.get_worksheet(db[f'worksheet_{coll_floors[0]}'])
-    print(f'got {coll_floors[0]} collection')
-    frmt = '%m-%d-%Y %H:%M:%S'
-    start_date = datetime.strptime('08-04-2022 09:04:00', frmt)
+    frmt = '%Y-%m-%d %H:%M:%S'
+    start_date = datetime.strptime('2022-08-23 14:57:06', frmt)
     now = datetime.strptime(datetime.now().strftime(frmt), frmt)
     dt = float((now - start_date).total_seconds()/86400)
-    r = len(sheet_instance.get_all_values()) + 1
-    sheet_instance.update_cell(r, 1, str(now))
-    sheet_instance.update_cell(r, 2, dt) 
-    c = 3
-    for nft in coll_floors[2]:
-        sheet_instance.update_cell(r, c, float(nft[1].split()[1]))
-        c += 1
-    sheet_instance.update_cell(r, c, float(coll_floors[1]))
-    print('collection spreadsheet updated..')
-    
+
+    sheet = openGoogleSheet()
     sheet_instance = sheet.get_worksheet(5)
     r = len(sheet_instance.get_all_values()) + 1
-    pf = [str(now), dt]
+    pf = [str(now), round(dt, 3)]
     ch = []
     for change in db['google_sheet']:
         ch.append(dict({'range': f'A{r}:J{r}', 'values': [[*pf, *change]]}))
         r += 1
-        #for i,c in enumerate(change):
     sheet_instance.batch_update(ch)
-    print('collection spreadsheet batch_updated..')  
+    db['google_sheet'] = []
+    print('google spreadsheet updated..')  
     
    
 async def googleUpdateSheet(ts):
