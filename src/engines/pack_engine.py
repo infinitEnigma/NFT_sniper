@@ -4,7 +4,6 @@ def prepareMessages(coll_name, nfts_nu, nfts_floors, chgs):
     # prepare discord embeds & twitts
     imgs = db['data'][coll_name][4]
     imgs_d = db['thumbs_d'][coll_name]
-    #print('test..imgs_d:', imgs_d, '\n', imgs)
     coll_sum = round(sum(nfts_floors.values()),2)
     coll_sumD = round(coll_sum * db['adaprice'],2)
     ic_url = [ic[1][3] for ic in db['data'].items() if ic[0]==coll_name]
@@ -23,10 +22,9 @@ def prepareMessages(coll_name, nfts_nu, nfts_floors, chgs):
         dollarP = 'usd price obtained via coingecko.com api'
         dt = f"{dollarP}\nchange: ₳ {it[2]} \u2198" if it[2]<0 else f"{dollarP}\nchange: ₳ +{it[2]} \u2197"
         embed1 = [t, d, 1157128 if it[2]<0 else 16711680]
-        for img,img_d in zip(imgs, imgs_d):
+        for img in imgs:
             if it[0] == img[0]:
-                #print('testing...img_d:\n', img_d, '\n', it[0])
-                embed1.append(img_d[it[0]])
+                embed1.append(imgs_d[1][it[0]])
                 twitt.append([img[1], f'{t}\n{dt}\nNFT link: {nfts_nu[1][it[0]]}'])
                 sheet.append([coll_name, coll_sum,  db["data"][coll_name][1][:-12], ic_url[0], it[0], it[1], nfts_nu[1][it[0]], img[1]])
                 break
