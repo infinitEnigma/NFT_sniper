@@ -3,6 +3,8 @@ from replit import db
 def prepareMessages(coll_name, nfts_nu, nfts_floors, chgs):
     # prepare discord embeds & twitts
     imgs = db['data'][coll_name][4]
+    imgs_d = db['thumbs_d'][coll_name]
+    #print('test..imgs_d:', imgs_d, '\n', imgs)
     coll_sum = round(sum(nfts_floors.values()),2)
     coll_sumD = round(coll_sum * db['adaprice'],2)
     ic_url = [ic[1][3] for ic in db['data'].items() if ic[0]==coll_name]
@@ -10,7 +12,7 @@ def prepareMessages(coll_name, nfts_nu, nfts_floors, chgs):
     d = l + "\n*collection latest changes:*\n" if len(chgs)>1 else l + '\n*collection latest change:*\n'
     dt = f"\nCollection Total:  ₳ {coll_sum} (${coll_sumD})\n{'for common plots & condo' if 'Land' in coll_name else ''}"
     embed, twitt, sheet = [], [], []
-    embed1 = [coll_name, d, 1127128, ic_url[0]]
+    embed1 = [coll_name, d, 1127128, imgs_d[0]]
     embed.append(embed1)
     twitt.append([ic_url[0], f'{coll_name}\nCollection link: {db["data"][coll_name][1][:-12]}{dt}'])
     for it in chgs:
@@ -21,18 +23,18 @@ def prepareMessages(coll_name, nfts_nu, nfts_floors, chgs):
         dollarP = 'usd price obtained via coingecko.com api'
         dt = f"{dollarP}\nchange: ₳ {it[2]} \u2198" if it[2]<0 else f"{dollarP}\nchange: ₳ +{it[2]} \u2197"
         embed1 = [t, d, 1157128 if it[2]<0 else 16711680]
-        for img in imgs:
+        for img,img_d in zip(imgs, imgs_d):
             if it[0] == img[0]:
-                embed1.append(img[1])
+                #print('testing...img_d:\n', img_d, '\n', it[0])
+                embed1.append(img_d[it[0]])
                 twitt.append([img[1], f'{t}\n{dt}\nNFT link: {nfts_nu[1][it[0]]}'])
                 sheet.append([coll_name, coll_sum,  db["data"][coll_name][1][:-12], ic_url[0], it[0], it[1], nfts_nu[1][it[0]], img[1]])
                 break
         embed.append(embed1)
-        #sheet.append([coll_name, it[0], it[1], coll_sum, db["data"][coll_name][1][:-12], nfts_nu[1][it[0]]])
     embed2 = [coll_name, "*collection current floors:*"]
     for item in nfts_floors.items():
         embed2.append([item[0], '₳ ' + str(item[1]), True])
-    embed2.append([f'Collection Total: ₳ {round(sum(nfts_floors.values()),2)}', ic_url[0]])
+    embed2.append([f'Collection Total: ₳ {round(sum(nfts_floors.values()),2)}', imgs_d[0]])
     embed.append(embed2)
     db['twitter_twitt'] = twitt
     db['google_sheet'] = sheet

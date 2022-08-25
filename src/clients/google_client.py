@@ -34,12 +34,13 @@ def updateCollFloorsSheet():
     r = len(sheet_instance.get_all_values()) + 1
     pf = [str(now), round(dt, 3)]
     ch = []
-    for change in db['google_sheet']:
-        ch.append(dict({'range': f'A{r}:J{r}', 'values': [[*pf, *change]]}))
-        r += 1
-    sheet_instance.batch_update(ch)
-    db['google_sheet'] = []
-    print('google spreadsheet updated..')  
+    if db['google_sheet'] != []:
+        for change in db['google_sheet']:
+            ch.append(dict({'range': f'A{r}:J{r}', 'values': [[*pf, *change]]}))
+            r += 1
+        sheet_instance.batch_update(ch)
+        db['google_sheet'] = []
+        print('google spreadsheet updated..')  
     
    
 async def googleUpdateSheet(ts):

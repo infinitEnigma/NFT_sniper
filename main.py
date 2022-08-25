@@ -25,7 +25,7 @@ keep_alive()
 loop = asyncio.get_event_loop() 
 while True:
     group1 = None
-    if db['discord_embed'] == [] and db['twitter'] == []:
+    if db['discord_embed'] == [] and db['twitter_twitt'] == []:
         print('check engines')
         group1 = asyncio.gather(*[track_engine.trackChanges()])# for i in range(1)]) #add init timestamp
     print('check twitter & google client')

@@ -23,17 +23,23 @@ async def on_ready():
         if db['discord_embed'] != []:
             embeds = db['discord_embed'][0]
             quote  = db['discord_embed'][1]
-
+            #coll_thumb = db['coll_thumbs_d'][embeds[0][0]]
+            #c = 0
             for e in embeds[:-1]:
                 embed = discord.Embed(title=e[0], description=e[1], color=e[2])
+                #if c == 0:
+                    #download_image(e[3])
+                #    embed.set_thumbnail(url=coll_thumb)
                 embed.set_thumbnail(url=e[3])
                 await asyncio.sleep(0.2)
                 await chnl.send(embed=embed)
                 print(f'..discord embed {embed.title} sent...')
+                #c += 1 
             embed = discord.Embed(title=embeds[-1][0], description=embeds[-1][1])#, color=e[2])
             for l in embeds[-1][2:-1]:
                 embed.add_field(name=l[0], value=l[1], inline=l[2])
             embed.set_thumbnail(url=embeds[-1][-1][-1])
+            #embed.set_thumbnail(url=coll_thumb)    
             embed.set_footer(text=embeds[-1][-1][0])
             await asyncio.sleep(0.2)
             await chnl.send(embed=embed)
@@ -55,7 +61,7 @@ async def on_ready():
 async def init(dt):
     print('discord init:', dt)
     print('finished:', datetime.now())
-    #return 'discord sent'
+    
     
 try: 
     asyncio.run(client.start(os.getenv('TOKEN')))

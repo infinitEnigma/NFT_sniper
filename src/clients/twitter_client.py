@@ -3,7 +3,7 @@ import os
 from twitter import *
 from time import sleep
 from datetime import datetime
-#import asyncio
+from src.engines.data_getter import download_image
 
 
 ### for automated account access
@@ -12,37 +12,26 @@ CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
 oauth_token = os.environ.get("oauth_token")
 oauth_secret = os.environ.get("oauth_secret")
 
-def getImgPath(t):
-    txt = t.split('?')[0].split('/')
-    im = txt[-1]
-    txt = txt[-2]
-    img_path = './src/img/'
-    if txt == 'land':
-        img_path = img_path + 'land/'
-    elif txt == 'summit':
-        img_path = img_path + 'summit/'
-    elif txt == 'vehicles':
-        img_path = img_path + 'vehicles/'
-    elif txt == 'vflects':
-        img_path = img_path + 'vflects/'
-    return img_path + im
-        
+
+
 def checkTwitts(twitts):
-    with open(getImgPath(twitts[0][0]), "rb") as imagefile:
+    download_image(twitts[0][0])
+    with open('src/img/image.png', "rb") as imagefile:
         img = imagefile.read()
     print('twitt T length:', len(twitts[0][1]))
     sendTwitt(img, twitts[0][1])
     print('twitt sent...', twitts[0][1])
     sleep(1)
     for t in twitts[1:]:
-        #nft_path = getImgPath(t[0])
-        with open(getImgPath(t[0]), "rb") as imagefile:
+        download_image(t[0])
+        with open('src/img/image.png', "rb") as imagefile:
             img = imagefile.read()
         print('twitt B length:', len(twitts[0][1]))
         sendTwitt(img, t[1])
         print('twitt sent...', t[1])
         sleep(1)
     print(f'\n...finished....{datetime.now()}..\n')
+    
     
 def sendTwitt(img, twitt):
     ### for bot account access
@@ -71,10 +60,10 @@ async def twitterSendTwitt(dt):
             print('finished:', datetime.now())
             return 'twitts sent'
         except Exception as e: 
-            if not 'twitter_errors' in db.keys():
-                db['twitter_errors'] = [str(datetime.now()), e]
-            else: 
-                db['twitter_errors'].append([str(datetime.now()), e])
+            #if not 'twitter_errors' in db.keys():
+            #    db['twitter_errors'] = [e]
+            #else: 
+            #    db['twitter_errors'].append([e])
             print('twitter start error:', e)
 
 ### for owner's account automated access

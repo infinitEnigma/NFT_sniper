@@ -1,37 +1,20 @@
 
 #import os
-import json
+#import json
 #import asyncio
 #import discord
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+#from selenium import webdriver
+#from selenium.webdriver.common.by import By
+#from selenium.webdriver.chrome.options import Options
 #from keep_alive import keep_alive
 from datetime import datetime
 from time import sleep
 from replit import db
 from src.engines.pack_engine import prepareMessages
+from src.engines.data_getter import PageGetter
+from src.engines.data_getter import get_coingecko, get_quote, openChrome
 
 
-class PageGetter:
-    def __init__(self, driver):
-        self.driver = driver
-    # get text from the page body 
-    def getPage(self, ch):
-        try: self.driver.get(ch)
-        except Exception as e:
-            print("PriceGetter: something went wrong", e)
-            return ''
-        try:
-            sleep(0.3)
-            bt = self.driver.find_element(By.CSS_SELECTOR, 'body').text
-        except Exception as e:
-            print("PriceGetter: no text in the body", e)
-            return ''
-        try: 
-            self.driver.get('chrome://settings/clearBrowserData')
-        except: print("couldn't clear browser cash")
-        return bt
 
 
 class CheckFloors:
@@ -81,26 +64,6 @@ class CheckFloors:
         if len(self.raised)>0: db['sum_raised'] = sum(float(s.split(',')[2]) for s in self.raised)
         return [-db['sum_lowered']+db['sum_raised'], len(chgs)]
 
-
-def get_coingecko(driver):
-    cg = "https://api.coingecko.com/api/v3/simple/price?ids=cardano&vs_currencies=usd"
-    response = PageGetter(driver).getPage(cg)
-    json_data = json.loads(response)
-    return float(json_data['cardano']['usd'])
-
-def get_quote(driver):
-    response = PageGetter(driver).getPage("https://zenquotes.io/api/random")
-    json_data = json.loads(response)
-    return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
-        
-def openChrome():
-    chrome_options = Options()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument("--incognito")
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument("--verbose")
-    return webdriver.Chrome(options=chrome_options)
 
 
 def loopCollections(driver):
