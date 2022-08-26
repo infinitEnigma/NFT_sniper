@@ -48,13 +48,16 @@ while True:
     
     if results:
         print(f'results: {results}')
+        if db['discord_errors'][1] != 0:
+                    print('\ndiscord error!!!...killing main process..\n')
+                    killMain()
         if len(results)==3:
-            if db['discord_errors'][1] != 0 or [None] in results[1] or results[0] == [None]:
-                print('\nresults error!!!...killing main process..\n')
+            if [None] in results[1] or results[0] == [None]:
+                print('\nresults_3 error!!!...killing main process..\n')
                 killMain()
         else:
-            if db['discord_errors'][1] != 0 or [None] in results[0]:
-                print('\nresults error!!!...killing main process..\n')
+            if [None] in results[0]:
+                print('\nresults_2 error!!!...killing main process..\n')
                 killMain()
     else: 
         print('\nno results!!!...killing main process..\n')
