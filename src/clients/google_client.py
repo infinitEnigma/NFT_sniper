@@ -54,7 +54,7 @@ async def update_sheet(ts):
             print('google spreadsheet updated..', datetime.now()) 
             return 'sheet updated'
         else: 
-            print('no sheet from updateCollFloorsSheet')
+            print('no sheet from prepare_dataframe')
             return 'no sheet'
     except Exception as e:
         print('google init error:', e)

@@ -44,7 +44,7 @@ def send_twitt():
         print('twitter finished:', datetime.now())
         return 'twitts sent'
     else: 
-        print('no twitt from checkTwitt')
+        print('no twitt from check_twitts')
         return 'no twitts'
    
    

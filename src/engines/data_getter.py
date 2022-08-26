@@ -30,18 +30,18 @@ class PageGetter:
         except: print("couldn't clear browser cash")
         return bt
 
+    def get_coingecko(self):
+        cg = "https://api.coingecko.com/api/v3/simple/price?ids=cardano&vs_currencies=usd"
+        response = self.get_page(cg)
+        json_data = json.loads(response)
+        return float(json_data['cardano']['usd'])
+    
+    def get_quote(self):
+        response = self.get_page("https://zenquotes.io/api/random")
+        json_data = json.loads(response)
+        return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
 
-def get_coingecko(driver):
-    cg = "https://api.coingecko.com/api/v3/simple/price?ids=cardano&vs_currencies=usd"
-    response = PageGetter(driver).get_page(cg)
-    json_data = json.loads(response)
-    return float(json_data['cardano']['usd'])
 
-def get_quote(driver):
-    response = PageGetter(driver).get_page("https://zenquotes.io/api/random")
-    json_data = json.loads(response)
-    return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
-        
 def open_chrome():
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')

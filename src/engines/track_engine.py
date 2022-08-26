@@ -2,8 +2,8 @@ from replit import db
 from time import sleep
 from datetime import datetime
 from src.engines.data_getter import PageGetter
+from src.engines.data_getter import open_chrome
 from src.engines.pack_engine import prepare_messages
-from src.engines.data_getter import get_coingecko, get_quote, open_chrome
 
 
 class CheckFloors:
@@ -17,8 +17,10 @@ class CheckFloors:
         nfts_nu = db['coll_urls'][c] 
         nfts_floors = db['coll_floors'][c]
         chgs = []
+        PG = PageGetter(self.driver)
         for a in nfts_nu[1].values():
-            bt = PageGetter(self.driver).get_page(a)
+            #bt = PageGetter(self.driver).get_page(a)
+            bt = PG.get_page(a)
             if bt and bt != '':
                 bt = bt.split('\n')
                 for v in range(len(bt)-1):
@@ -36,8 +38,8 @@ class CheckFloors:
                                 print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - floor lowered!!! {change}")
                             nfts_floors[bt[v]] = float(bt[v+1])
                             chgs.append((bt[v], bt[v+1], round(change,2)))
-                            db['adaprice'] = get_coingecko(self.driver)
-                            db['quote'] = get_quote(self.driver)
+                            db['adaprice'] = PG.get_coingecko()
+                            db['quote'] = PG.get_quote()
                         break
             else:
                 print('CheckFloors: no body text')
