@@ -19,38 +19,25 @@ def checkTwitts(twitts):
     with open('src/img/image.png', "rb") as imagefile:
         img = imagefile.read()
     print('twitt T length:', len(twitts[0][1]))
-    #sendTwitt(img, twitts[0][1])
     twitt = [[img, twitts[0][1]]]
-    #print('twitt sent...', twitts[0][1])
-    #sleep(1)
     for t in twitts[1:]:
         download_image(t[0])
         with open('src/img/image.png', "rb") as imagefile:
             img = imagefile.read()
         print('twitt B length:', len(twitts[0][1]))
-        #sendTwitt(img, t[1])
         twitt.append([img, t[1]])
-        #print('twitt sent...', t[1])
-        #sleep(1)
-    print(f'\n...finished....{datetime.now()}..\n')
     return twitt
     
     
 def sendTwitt(img, twitt, twitter):
-    ### for bot account access
-    #twitter = Twitter(auth=OAuth(
-    #    oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET))
-    #twitter.statuses.update(status='api test3...')
-    # for media using the old deprecated
     params = {"media[]": img, "status": twitt}
-    # Or for an image encoded as base64:
     #params = {"media[]": img, "status": twitt, "_base64": True}
     twitter.statuses.update_with_media(**params)
-    #print('status updated')
    
-
+   
   
 async def twitterSendTwitt(dt):
+    print('twitter init:', dt)
     if db['twitter_twitt'] != []:
         try:
             twitt = checkTwitts(db['twitter_twitt'])
@@ -62,8 +49,7 @@ async def twitterSendTwitt(dt):
                     print('twitt sent...', t[1])
                     sleep(1)
                 db['twitter_twitt'] = []
-                print('twitter init:', dt)
-                print('finished:', datetime.now())
+                print('twitter finished:', datetime.now())
                 return 'twitts sent'
             else: 
                 print('no twitt from checkTwitt')

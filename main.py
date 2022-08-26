@@ -1,17 +1,19 @@
-import sys
-import asyncio
-from src.engines.keep_alive import keep_alive
 from replit import db
-#from time import sleep
 from datetime import datetime
 from src.engines import track_engine
 from src.clients import twitter_client
 from src.clients import google_client
+from src.engines.keep_alive import keep_alive
+
+import sys
+import asyncio
 import importlib
 import nest_asyncio
 nest_asyncio.apply()
 
-def killMain():
+    
+
+def kill_main():
     db['discord_errors'][1] = 0
     db['saved_state'][0] = 0
     try:
@@ -21,13 +23,29 @@ def killMain():
         print("\nsuicide didn't work\n", e)
         db['saved_state'][0] = 1
 
+
+def check_results(results):
+    print(f'results: {results}')
+    if db['discord_errors'][1] != 0:
+        print('\ndiscord error!!!...killing main process..\n')
+        kill_main()
+    if len(results)==3:
+        if [None] in results[1] or results[0] == [None]:
+            print('\nresults_3 error!!!...killing main process..\n')
+            kill_main()
+    else:
+        if [None] in results[0]:
+            print('\nresults_2 error!!!...killing main process..\n')
+            kill_main()
+
+
 keep_alive()
 loop = asyncio.get_event_loop() 
 while True:
     group1 = None
     if db['discord_embed'] == [] and db['twitter_twitt'] == []:
         print('check engines')
-        group1 = asyncio.gather(*[track_engine.trackChanges()])# for i in range(1)]) #add init timestamp
+        group1 = asyncio.gather(*[track_engine.trackChanges()])
     print('check twitter & google client')
     group2 = asyncio.gather(*[twitter_client.twitterSendTwitt(datetime.now()),
                              google_client.googleUpdateSheet(datetime.now())])
@@ -47,19 +65,9 @@ while True:
     print(f'loop completed: {datetime.now()}')
     
     if results:
-        print(f'results: {results}')
-        if db['discord_errors'][1] != 0:
-                    print('\ndiscord error!!!...killing main process..\n')
-                    killMain()
-        if len(results)==3:
-            if [None] in results[1] or results[0] == [None]:
-                print('\nresults_3 error!!!...killing main process..\n')
-                killMain()
-        else:
-            if [None] in results[0]:
-                print('\nresults_2 error!!!...killing main process..\n')
-                killMain()
+        check_results(results)
     else: 
         print('\nno results!!!...killing main process..\n')
-        killMain()
+        kill_main()
+        
     print('results ok... next loop...\n')

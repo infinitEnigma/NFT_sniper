@@ -23,7 +23,7 @@ def openGoogleSheet():
     return client.open('NFT tracker')
    
 
-def updateCollFloorsSheet():
+def prepare_dataframe():
     frmt = '%Y-%m-%d %H:%M:%S'
     start_date = datetime.strptime('2022-08-23 14:57:06', frmt)
     now = datetime.strptime(datetime.now().strftime(frmt), frmt)
@@ -38,15 +38,26 @@ def updateCollFloorsSheet():
         for change in db['google_sheet']:
             ch.append(dict({'range': f'A{r}:J{r}', 'values': [[*pf, *change]]}))
             r += 1
-        sheet_instance.batch_update(ch)
-        db['google_sheet'] = []
-        print('google spreadsheet updated..')  
+        #sheet_instance.batch_update(ch)
+        return [sheet_instance, ch]
+        #db['google_sheet'] = []
+        #print('google spreadsheet updated..')  
     
    
 async def googleUpdateSheet(ts):
     print('google init:', ts)
-    try: updateCollFloorsSheet()
+    try: 
+        sheet = prepare_dataframe()
+        if sheet:
+            sheet[0].batch_update(sheet[1])
+            db['google_sheet'] = []
+            print('google spreadsheet updated..', datetime.now()) 
+            return 'sheet updated'
+        else: 
+            print('no sheet from updateCollFloorsSheet')
+            return 'no sheet'
     except Exception as e:
         print('google init error:', e)
-    print('google finished at:', datetime.now())
-    return 'sheet updated'
+        return 'no sheet'
+    
+   
