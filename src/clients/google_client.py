@@ -1,11 +1,11 @@
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-from datetime import datetime
-from replit import db
 import os
+import gspread
+from replit import db
+from datetime import datetime
+from oauth2client.service_account import ServiceAccountCredentials
 
 
-def openGoogleSheet():
+def open_google_sheet():
     # define the scope & credentials & authorize the clientsheet 
     scope_app =['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     creds = {'type': os.environ.get("type"),
@@ -29,7 +29,7 @@ def prepare_dataframe():
     now = datetime.strptime(datetime.now().strftime(frmt), frmt)
     dt = float((now - start_date).total_seconds()/86400)
 
-    sheet = openGoogleSheet()
+    sheet = open_google_sheet()
     sheet_instance = sheet.get_worksheet(5)
     r = len(sheet_instance.get_all_values()) + 1
     pf = [str(now), round(dt, 3)]
@@ -44,7 +44,7 @@ def prepare_dataframe():
         #print('google spreadsheet updated..')  
     
    
-async def googleUpdateSheet(ts):
+async def update_sheet(ts):
     print('google init:', ts)
     try: 
         sheet = prepare_dataframe()

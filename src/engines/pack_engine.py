@@ -1,6 +1,6 @@
 from replit import db
 
-def prepareMessages(coll_name, nfts_nu, nfts_floors, chgs):
+def prepare_messages(coll_name, nfts_nu, nfts_floors, chgs):
     # prepare discord embeds & twitts
     imgs = db['data'][coll_name][4]
     imgs_d = db['thumbs_d'][coll_name]

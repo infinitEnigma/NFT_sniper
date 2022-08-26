@@ -58,7 +58,7 @@ async def on_ready():
     except: print('loop killed')
 
 
-async def init(dt):
+async def send_embeds(dt):
     print('discord init:', dt)
     print('finished:', datetime.now())
     

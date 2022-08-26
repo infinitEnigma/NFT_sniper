@@ -1,19 +1,20 @@
+import json
+import io, os
+import requests
+import tempfile
+from PIL import Image
+from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from time import sleep
-import json
-from PIL import Image
-import requests
-import io, os
-import tempfile
+
 
 
 class PageGetter:
     def __init__(self, driver):
         self.driver = driver
     # get text from the page body 
-    def getPage(self, ch):
+    def get_page(self, ch):
         try: self.driver.get(ch)
         except Exception as e:
             print("PriceGetter: something went wrong", e)
@@ -41,7 +42,7 @@ def get_quote(driver):
     json_data = json.loads(response)
     return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
         
-def openChrome():
+def open_chrome():
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')

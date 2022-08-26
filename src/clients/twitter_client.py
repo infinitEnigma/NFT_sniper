@@ -1,6 +1,6 @@
-from replit import db
 import os
 from twitter import *
+from replit import db
 from time import sleep
 from datetime import datetime
 from src.engines.data_getter import download_image
@@ -14,7 +14,7 @@ oauth_secret = os.environ.get("oauth_secret")
 
 
 
-def checkTwitts(twitts):
+def check_twitts(twitts):
     download_image(twitts[0][0])
     with open('src/img/image.png', "rb") as imagefile:
         img = imagefile.read()
@@ -29,23 +29,23 @@ def checkTwitts(twitts):
     return twitt
     
     
-def sendTwitt(img, twitt, twitter):
+def send_twitt(img, twitt, twitter):
     params = {"media[]": img, "status": twitt}
     #params = {"media[]": img, "status": twitt, "_base64": True}
     twitter.statuses.update_with_media(**params)
    
    
   
-async def twitterSendTwitt(dt):
+async def send_twitts(dt):
     print('twitter init:', dt)
     if db['twitter_twitt'] != []:
         try:
-            twitt = checkTwitts(db['twitter_twitt'])
+            twitt = check_twitts(db['twitter_twitt'])
             if twitt:
                 twitter = Twitter(auth=OAuth(
                     oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET))
                 for t in twitt:
-                    sendTwitt(t[0], t[1], twitter)
+                    send_twitt(t[0], t[1], twitter)
                     print('twitt sent...', t[1])
                     sleep(1)
                 db['twitter_twitt'] = []

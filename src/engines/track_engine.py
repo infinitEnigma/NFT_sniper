@@ -1,20 +1,9 @@
-
-#import os
-#import json
-#import asyncio
-#import discord
-#from selenium import webdriver
-#from selenium.webdriver.common.by import By
-#from selenium.webdriver.chrome.options import Options
-#from keep_alive import keep_alive
-from datetime import datetime
-from time import sleep
 from replit import db
-from src.engines.pack_engine import prepareMessages
+from time import sleep
+from datetime import datetime
 from src.engines.data_getter import PageGetter
-from src.engines.data_getter import get_coingecko, get_quote, openChrome
-
-
+from src.engines.pack_engine import prepare_messages
+from src.engines.data_getter import get_coingecko, get_quote, open_chrome
 
 
 class CheckFloors:
@@ -23,13 +12,13 @@ class CheckFloors:
         self.raised = []
         self.lowered = []
     # extract prices and check for the changes
-    def checkPrices(self, coll_name, c):
+    def check_prices(self, coll_name, c):
         print(f'Collection: {coll_name}\n')
         nfts_nu = db['coll_urls'][c] 
         nfts_floors = db['coll_floors'][c]
         chgs = []
         for a in nfts_nu[1].values():
-            bt = PageGetter(self.driver).getPage(a)
+            bt = PageGetter(self.driver).get_page(a)
             if bt and bt != '':
                 bt = bt.split('\n')
                 for v in range(len(bt)-1):
@@ -58,16 +47,14 @@ class CheckFloors:
         if len(self.raised)+len(self.lowered)>0:
             # write last known values to db
             db[db['data'][coll_name][0]] = dict({it[0]: float(it[1]) for it in nfts_floors.items()})
-            prepareMessages(coll_name, nfts_nu, nfts_floors, chgs)
+            prepare_messages(coll_name, nfts_nu, nfts_floors, chgs)
         # get change sums
         if len(self.lowered)>0: db['sum_lowered'] = sum(float(s.split(',')[2]) for s in self.lowered)
         if len(self.raised)>0: db['sum_raised'] = sum(float(s.split(',')[2]) for s in self.raised)
         return [-db['sum_lowered']+db['sum_raised'], len(chgs)]
 
 
-
-def loopCollections(driver):
-    #driver = openChrome()
+def loop_collections(driver):
     if db['saved_state'][0] == 0:
         db['change_tracker'] = dict({coll:[0,0,0] for coll in db['data'].keys()})
         db['gCounter'] = 0
@@ -81,13 +68,13 @@ def loopCollections(driver):
         print('restarts:', db['restarts'])
         for coll in db['data'].items():
             c += 1
-            if db['saved_state'][0] == 1: #in db.keys():
+            if db['saved_state'][0] == 1: 
                 if coll[0] != db['saved_state'][1]:
                     print('not saved coll:', coll[0])
                     continue
             db['saved_state'] = [0, coll]
             # check floors
-            check = CheckFloors(driver).checkPrices(coll[0], c-1)
+            check = CheckFloors(driver).check_prices(coll[0], c-1)
             sleep(0.5)
             if check == 'False' or check == [0]:
                 driver.quit()
@@ -109,11 +96,9 @@ def loopCollections(driver):
         sleep(5)
 
 
-
-#keep_alive()
-async def trackChanges():
+async def track_changes():
     if db['saved_state'][0] == 0:
         db['restarts'] = [db['restarts'][0]+1, str(datetime.now())]
-    check = loopCollections(openChrome()) 
+    check = loop_collections(open_chrome()) 
     if check == 'send': return check
-    else: trackChanges()
+    else: track_changes()
