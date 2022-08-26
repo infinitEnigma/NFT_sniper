@@ -29,10 +29,23 @@ def check_twitts(twitts):
     return twitt
     
     
-def send_twitt(img, twitt, twitter):
-    params = {"media[]": img, "status": twitt}
-    #params = {"media[]": img, "status": twitt, "_base64": True}
-    twitter.statuses.update_with_media(**params)
+def send_twitt():
+    twitt = check_twitts(db['twitter_twitt'])
+    if twitt:
+        twitter = Twitter(auth=OAuth(
+            oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET))
+        for t in twitt:
+            params = {"media[]": t[0], "status": t[1]}
+            #params = {"media[]": img, "status": twitt, "_base64": True}
+            twitter.statuses.update_with_media(**params)
+            print('twitt sent...', t[1])
+            sleep(1)
+        db['twitter_twitt'] = []
+        print('twitter finished:', datetime.now())
+        return 'twitts sent'
+    else: 
+        print('no twitt from checkTwitt')
+        return 'no twitts'
    
    
   
@@ -40,19 +53,11 @@ async def send_twitts(dt):
     print('twitter init:', dt)
     if db['twitter_twitt'] != []:
         try:
-            twitt = check_twitts(db['twitter_twitt'])
-            if twitt:
-                twitter = Twitter(auth=OAuth(
-                    oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET))
-                for t in twitt:
-                    send_twitt(t[0], t[1], twitter)
-                    print('twitt sent...', t[1])
-                    sleep(1)
-                db['twitter_twitt'] = []
-                print('twitter finished:', datetime.now())
-                return 'twitts sent'
+            result = send_twitt()
+            if result:
+                return result
             else: 
-                print('no twitt from checkTwitt')
+                print('no result from send_twitt')
                 return 'no twitts'
         except Exception as e: 
             print('twitter start error:', e)

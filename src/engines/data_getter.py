@@ -33,12 +33,12 @@ class PageGetter:
 
 def get_coingecko(driver):
     cg = "https://api.coingecko.com/api/v3/simple/price?ids=cardano&vs_currencies=usd"
-    response = PageGetter(driver).getPage(cg)
+    response = PageGetter(driver).get_page(cg)
     json_data = json.loads(response)
     return float(json_data['cardano']['usd'])
 
 def get_quote(driver):
-    response = PageGetter(driver).getPage("https://zenquotes.io/api/random")
+    response = PageGetter(driver).get_page("https://zenquotes.io/api/random")
     json_data = json.loads(response)
     return f"*{json_data[0]['q']}* - {json_data[0]['a']}"
         

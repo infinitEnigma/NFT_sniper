@@ -12,30 +12,21 @@ from src.engines.keep_alive import keep_alive
 
 nest_asyncio.apply()
 
-def kill_main():
-    db['discord_errors'][1] = 0
-    db['saved_state'][0] = 0
-    try:
-        import subprocess
-        subprocess.run(['kill', '1'])
-    except Exception as e: 
-        print("\nsuicide didn't work\n", e)
-        db['saved_state'][0] = 1
 
 def check_results(results):
     print(f'results: {results}')
     if db['discord_errors'][1] != 0:
         print('\ndiscord error!!!...killing main process..\n')
-        kill_main()
+        return 'kill'
     if len(results)==3:
         if [None] in results[1] or results[0] == [None]:
             print('\nresults_3 error!!!...killing main process..\n')
-            kill_main()
+            return 'kill'
     else:
         if [None] in results[0]:
             print('\nresults_2 error!!!...killing main process..\n')
-            kill_main()
-
+            return 'kill'
+    return 'ok'
 
 keep_alive()
 loop = asyncio.get_event_loop() 
@@ -64,8 +55,16 @@ while True:
     print(f'loop completed: {datetime.now()}')
     
     if results:
-        check_results(results)
+        check = check_results(results)
     else: 
         print('\nno results!!!...killing main process..\n')
-        kill_main()
+        check = 'kill'
+    if check == 'kill': 
+        db['discord_errors'][1] = 0
+        db['saved_state'][0] = 0
+        import subprocess
+        try: subprocess.run(['kill', '1'])
+        except Exception as e: 
+            print("\nsuicide didn't work\n", e)
+            db['saved_state'][0] = 1
     print('results ok... next loop...\n')
