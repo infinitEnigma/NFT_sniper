@@ -11,6 +11,7 @@ class CheckFloors:
         self.driver = driver
         self.raised = []
         self.lowered = []
+        
     # extract prices and check for the changes
     def check_prices(self, coll_name, c):
         print(f'Collection: {coll_name}\n')
@@ -21,9 +22,11 @@ class CheckFloors:
         for a in nfts_nu[1].values():
             #bt = PageGetter(self.driver).get_page(a)
             bt = PG.get_page(a)
+            #print("coll_urls:", a, bt)
             if bt and bt != '':
                 bt = bt.split('\n')
                 for v in range(len(bt)-1):
+                    #print('CheckFloors!!!:', a, bt[v], nfts_nu[0])
                     if bt[v] in nfts_nu[0]:
                         if float(bt[v+1]) == nfts_floors[bt[v]]:
                             print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - no changes")
@@ -32,7 +35,6 @@ class CheckFloors:
                             if change > 0:
                                 self.raised.append(f"{bt[v]},{bt[v+1]},{change}")
                                 print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - floor raised: +{change}")
-
                             else:
                                 self.lowered.append(f"{bt[v]},{bt[v+1]},{change}")
                                 print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - floor lowered!!! {change}")

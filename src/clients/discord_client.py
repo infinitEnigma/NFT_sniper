@@ -6,8 +6,10 @@ from replit import db
 from datetime import datetime
 #from discord.ext import commands
 
-    
-client = discord.Client()
+intents = discord.Intents.default()
+intents.typing = True
+intents.presences = True  
+client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():

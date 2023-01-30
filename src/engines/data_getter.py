@@ -13,15 +13,23 @@ from selenium.webdriver.chrome.options import Options
 class PageGetter:
     def __init__(self, driver):
         self.driver = driver
+    
     # get text from the page body 
     def get_page(self, ch):
-        try: self.driver.get(ch)
+        try: 
+            self.driver.get(ch)
         except Exception as e:
             print("PriceGetter: something went wrong", e)
             return ''
         try:
-            sleep(0.3)
-            bt = self.driver.find_element(By.CSS_SELECTOR, 'body').text
+            sleep(1.5)
+            #self.driver.implicitly_wait(2)
+            b = self.driver.find_element(By.CSS_SELECTOR, 'body')#.text
+            try:
+                b = b.find_element(By.ID, 'marketplace')
+            except: 
+                print("get page: no marketplace!!!", ch)
+            bt = b.text
         except Exception as e:
             print("PriceGetter: no text in the body", e)
             return ''
