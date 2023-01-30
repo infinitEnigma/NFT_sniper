@@ -20,13 +20,10 @@ class CheckFloors:
         chgs = []
         PG = PageGetter(self.driver)
         for a in nfts_nu[1].values():
-            #bt = PageGetter(self.driver).get_page(a)
             bt = PG.get_page(a)
-            #print("coll_urls:", a, bt)
             if bt and bt != '':
                 bt = bt.split('\n')
                 for v in range(len(bt)-1):
-                    #print('CheckFloors!!!:', a, bt[v], nfts_nu[0])
                     if bt[v] in nfts_nu[0]:
                         if float(bt[v+1]) == nfts_floors[bt[v]]:
                             print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - no changes")
@@ -84,7 +81,7 @@ def loop_collections(driver):
                 driver.quit()
                 print("main2: no check_floors in while loop")
                 sleep(3)
-                return
+                return ''
             # if there's a change in price update changes tracker
             elif check[0] > 0:
                 p = db['change_tracker'][coll[0]][0]+db['sum_lowered']
@@ -97,7 +94,7 @@ def loop_collections(driver):
             print(f"\nchanges/checks: {db['change_tracker'][coll[0]][2]}/{db['gCounter']}\n")
         c = 0
         print(datetime.now(), 'pause...\n\n')
-        sleep(5)
+        sleep(8)
 
 
 async def track_changes():
@@ -105,4 +102,4 @@ async def track_changes():
         db['restarts'] = [db['restarts'][0]+1, str(datetime.now())]
     check = loop_collections(open_chrome()) 
     if check == 'send': return check
-    else: track_changes()
+    else: await track_changes()

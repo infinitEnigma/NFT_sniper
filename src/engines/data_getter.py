@@ -19,25 +19,37 @@ class PageGetter:
         try: 
             self.driver.get(ch)
         except Exception as e:
-            print("PriceGetter: something went wrong", e)
+            print("PageGetter: something went wrong", e)
             return ''
-        try:
-            sleep(1.5)
-            #self.driver.implicitly_wait(2)
-            b = self.driver.find_element(By.CSS_SELECTOR, 'body')#.text
+        if 'jpg.store' in ch: 
+            b = self.get_jpgstore()
             try:
-                b = b.find_element(By.ID, 'marketplace')
+                bt = b.text
             except: 
-                print("get page: no marketplace!!!", ch)
-            bt = b.text
-        except Exception as e:
-            print("PriceGetter: no text in the body", e)
-            return ''
+                print('PageGetter: no data from jpg.store')
+                return ''
+        else:
+            try:
+                bt = self.driver.find_element(By.CSS_SELECTOR, 'body').text
+            except Exception as e:
+                print("PageGetter: no text in the body", e)
+                return ''    
         try: 
             self.driver.get('chrome://settings/clearBrowserData')
         except: print("couldn't clear browser cash")
         return bt
 
+    def get_jpgstore(self):
+        try:
+            # slow loding of the marketplace section - sleep(4) seems fine 
+            sleep(4)
+            b = self.driver.find_element(By.CSS_SELECTOR, 'body')
+            bt = b.find_element(By.ID, 'marketplace')
+            return bt
+        except:
+            print('get_jpgstore: no data from marketplace')
+            return ''
+       
     def get_coingecko(self):
         cg = "https://api.coingecko.com/api/v3/simple/price?ids=cardano&vs_currencies=usd"
         response = self.get_page(cg)
