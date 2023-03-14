@@ -11,7 +11,8 @@ from src.clients import twitter_client
 from src.engines.keep_alive import keep_alive
 
 nest_asyncio.apply()
-
+#print(db['discord_errors'][1])
+#print(db['saved_state'][0])
 
 def check_results(results):
     print(f'results: {results}')
@@ -47,10 +48,12 @@ while True:
         print('discord_client module reloaded')
     group3 = asyncio.gather(*[src.clients.discord_client.send_embeds(datetime.now())])
     if group1:
+        #print("all_groups")
         all_groups = asyncio.gather(group1, group2, group3)
     else: 
+        #print("two_groups")
         all_groups = asyncio.gather(group2, group3)
-        
+    #print("loop")    
     results = loop.run_until_complete(all_groups)
     print(f'loop completed: {datetime.now()}')
     

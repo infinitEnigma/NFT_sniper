@@ -1,3 +1,4 @@
+
 import json
 import io, os
 import requests
@@ -41,13 +42,14 @@ class PageGetter:
 
     def get_jpgstore(self):
         try:
-            # slow loding of the marketplace section - sleep(4) seems fine 
-            sleep(4)
+            # slow loading of the marketplace section - sleep(5) seems fine 
+            sleep(5)
             b = self.driver.find_element(By.CSS_SELECTOR, 'body')
-            bt = b.find_element(By.ID, 'marketplace')
+            bt = b.find_element(By.CSS_SELECTOR, '#app > main')
+            #bt = b.find_element(By.CSS_SELECTOR, '#radix-\:Rbahl6\:-content-items > section > div.grid-cols-12.gap-4.lg\:grid.lg\:min-h-\[70vh\].lg\:pb-12 > div.col-span-12')
             return bt
-        except:
-            print('get_jpgstore: no data from marketplace')
+        except Exception as e:
+            print('get_jpgstore: no data from marketplace\n', e)
             return ''
        
     def get_coingecko(self):

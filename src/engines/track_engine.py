@@ -18,27 +18,31 @@ class CheckFloors:
         nfts_nu = db['coll_urls'][c] 
         nfts_floors = db['coll_floors'][c]
         chgs = []
-        PG = PageGetter(self.driver)
+        #PG = PageGetter(self.driver)
         for a in nfts_nu[1].values():
-            bt = PG.get_page(a)
+            PG = PageGetter(self.driver)
+            bt = PG.get_page(a + '&tab=items')
             if bt and bt != '':
                 bt = bt.split('\n')
                 for v in range(len(bt)-1):
                     if bt[v] in nfts_nu[0]:
-                        if float(bt[v+1]) == nfts_floors[bt[v]]:
-                            print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - no changes")
+                        nft = bt[v]
+                        price = bt[v+1][1:]
+                        if float(price) == nfts_floors[nft]:
+                            print(f"{nft}: {(30-len(nft))*' '}{price} - no changes")
                         else:
-                            change = float(bt[v+1])-nfts_floors[bt[v]]
+                            change = float(price)-nfts_floors[nft]
                             if change > 0:
-                                self.raised.append(f"{bt[v]},{bt[v+1]},{change}")
-                                print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - floor raised: +{change}")
+                                self.raised.append(f"{nft},{price},{change}")
+                                print(f"{nft}: {(30-len(nft))*' '}{price} - floor raised: +{change}")
                             else:
-                                self.lowered.append(f"{bt[v]},{bt[v+1]},{change}")
-                                print(f"{bt[v]}: {(30-len(bt[v]))*' '}{bt[v+1]} - floor lowered!!! {change}")
-                            nfts_floors[bt[v]] = float(bt[v+1])
-                            chgs.append((bt[v], bt[v+1], round(change,2)))
+                                self.lowered.append(f"{nft},{price},{change}")
+                                print(f"{nft}: {(30-len(nft))*' '}{price} - floor lowered!!! {change}")
+                            nfts_floors[nft] = float(price)
+                            chgs.append((nft, price, round(change,2)))
                             db['adaprice'] = PG.get_coingecko()
                             db['quote'] = PG.get_quote()
+                            PG = None
                         break
             else:
                 print('CheckFloors: no body text')
@@ -76,7 +80,7 @@ def loop_collections(driver):
             db['saved_state'] = [0, coll]
             # check floors
             check = CheckFloors(driver).check_prices(coll[0], c-1)
-            sleep(0.5)
+            #sleep(0.5)
             if check == 'False' or check == [0]:
                 driver.quit()
                 print("main2: no check_floors in while loop")
@@ -91,10 +95,10 @@ def loop_collections(driver):
                 db['saved_state'] = [1, coll[0]] 
                 return 'send'
             print(f"changes since\nthe session start: lowered {db['change_tracker'][coll[0]][0]}, raised +{db['change_tracker'][coll[0]][1]}")
-            print(f"\nchanges/checks: {db['change_tracker'][coll[0]][2]}/{db['gCounter']}\n")
+            print(f"\nchecks/changes: {db['gCounter']}/{db['change_tracker'][coll[0]][2]}\n")
         c = 0
         print(datetime.now(), 'pause...\n\n')
-        sleep(8)
+        sleep(10)
 
 
 async def track_changes():

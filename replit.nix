@@ -1,5 +1,6 @@
 { pkgs }: {
   deps = [
+    pkgs.toybox
     pkgs.python38Full
     pkgs.chromium
     pkgs.chromedriver
