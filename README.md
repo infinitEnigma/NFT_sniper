@@ -6,7 +6,7 @@
 In this example we have two apps.
 First one is tracking NFT data from [jpg.store](https://jpg.store) for specific
 NFTs/Collections and share detected changes across the networks in adequate formats.
-Data is shared on Twitter and Discord using automated accounts. It is also stored on Google drive/sheets 
+Data is shared on Twitter and Discord using automated accounts. It is also stored on Google drive/sheets. 
 This data is taken directly from market pages with [Selenium](https://www.selenium.dev/), as there is no API for jpg.store.
 It is running on replit's dev servers.
 Second app with [streamlit](https://streamlit.io) is used for presenting this data with charts and tables.
