@@ -1,4 +1,4 @@
-## MVP product 
+## MVP - tracking bot 
 **showcasing the use of different strategies and tools to achieve**
 **set of goals in unite manner and free of charge for educational purposes**
 
