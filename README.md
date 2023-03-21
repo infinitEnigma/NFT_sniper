@@ -32,7 +32,7 @@ Adapting is the must.
 
 ### Links
 - [most of the code is running on replit's dev servers](https://NFTsniper.infinitenigma.repl.co)
-- [streamlit part is running on AWS EC2 micro instance](http://34.218.246.192:8501/)
+- [streamlit part is running on AWS EC2 micro instance](http://nftsniper.ddns.net:8501/)
 - [twitter automated account](https://twitter.com/JovanSt88177114)
 - [discord server - ask for the invite](https://docs.google.com/forms/d/e/1FAIpQLSdaYHD4FFwkJiBTaKJ_M974QhWPR-_c287BB9UOtFuwbF9EhA/viewform?usp=sf_link)
 - [google sheets - ask for permission](https://docs.google.com/forms/d/e/1FAIpQLSdaYHD4FFwkJiBTaKJ_M974QhWPR-_c287BB9UOtFuwbF9EhA/viewform?usp=sf_link)
